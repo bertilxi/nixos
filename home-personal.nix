@@ -44,12 +44,49 @@
   programs.starship.enable = true;
   programs.starship.enableFishIntegration = true;
 
-  # Config files
-  home.file = {
-    # ".npmrc" = {
-    #   text = ''
-    #     prefix=/home/berti/.npm-global
-    #   '';
-    # };
-  };
+  # Packages
+  home.packages = [
+    # system
+    pkgs.nixpkgs-fmt
+    pkgs.powertop
+    pkgs.ksshaskpass
+    pkgs.kdePackages.kconfig
+    pkgs.kdePackages.partitionmanager
+
+    # Fonts
+    pkgs.noto-fonts
+    pkgs.noto-fonts-cjk
+    pkgs.noto-fonts-emoji
+
+    # utils
+    pkgs.git
+    pkgs.btop
+    pkgs.fastfetch
+    pkgs.bat
+    pkgs.unrar
+
+    # browsers
+    pkgs.firefox
+    pkgs.google-chrome
+
+    # media
+    pkgs.standardnotes
+    pkgs.vlc
+    pkgs.obs-studio
+    pkgs.shotcut
+    pkgs.ffmpeg-full
+    pkgs.guvcview
+    pkgs.mangohud
+    pkgs.inkscape
+    pkgs.gimp
+    pkgs.prismlauncher
+
+    # comms
+    pkgs.vesktop
+
+    # dev
+    pkgs.vscode
+    pkgs.beekeeper-studio
+  ];
+
 }

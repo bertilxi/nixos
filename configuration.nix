@@ -1,22 +1,17 @@
-# Edit this configuration file to define what should be installed on
-# your system.  Help is available in the configuration.nix(5) man page
-# and in the NixOS manual (accessible by running ‘nixos-help’).
-
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 {
   imports =
     [
-      # Include the results of the hardware scan.
       ./hardware-configuration.nix
 
       ./secrets.nix
     ];
 
   # Bootloader.
+  boot.initrd.luks.devices."luks-f7e3bfc9-ae34-41d3-84bb-da63518e8187".device = "/dev/disk/by-uuid/f7e3bfc9-ae34-41d3-84bb-da63518e8187";
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  boot.initrd.luks.devices."luks-f7e3bfc9-ae34-41d3-84bb-da63518e8187".device = "/dev/disk/by-uuid/f7e3bfc9-ae34-41d3-84bb-da63518e8187";
   networking.hostName = "one";
 
   # Enable networking
@@ -54,9 +49,6 @@
     xkb.variant = "";
   };
 
-  # Enable CUPS to print documents.
-  services.printing.enable = false;
-
   # Enable sound with pipewire.
   sound.enable = true;
   hardware.pulseaudio = {
@@ -76,8 +68,12 @@
     isNormalUser = true;
     description = "Fernando Berti";
     extraGroups = [ "networkmanager" "wheel" ];
-    packages = with pkgs; [
-    ];
+  };
+
+  users.users.berti-viome = {
+    isNormalUser = true;
+    description = "Work";
+    extraGroups = [ "networkmanager" "wheel" ];
   };
 
   # Enable automatic login for the user.
@@ -95,9 +91,9 @@
   #
 
   # Nix config
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
   nix.optimise.automatic = true;
-  boot.loader.systemd-boot.configurationLimit = 5;
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  boot.loader.systemd-boot.configurationLimit = 10;
   nix.gc = {
     automatic = true;
     dates = "weekly";
@@ -106,16 +102,7 @@
   nix.settings.auto-optimise-store = true;
 
   # Kernel
-  # boot.kernelPackages = pkgs.linuxPackages_latest;
-  # boot.kernelPackages = pkgs.linuxPackages_zen;
   boot.kernelPackages = pkgs.linuxPackages_xanmod;
-
-  # Battery
-  powerManagement.enable = true;
-  services.tlp.enable = false;
-  services.power-profiles-daemon.enable = true;
-  powerManagement.powertop.enable = true;
-  programs.auto-cpufreq.enable = false;
 
   # Bluetooth
   hardware.bluetooth.enable = true;
@@ -133,90 +120,7 @@
   # Security
   networking.firewall = {
     enable = true;
-    # allowedTCPPorts = [ 3000 ];
-    # allowedUDPPorts = [ 16261 ];
-
-    # allowedTCPPortRanges = [
-    #   { from = 16262; to = 16272; }
-    # ];
-    # allowedUDPPortRanges = [ ];
   };
-
-  # Env vars
-  environment.variables = {
-    NIXOS_OZONE_WL = "1";
-  };
-  environment.sessionVariables = rec {
-    # STEAM_FORCE_DESKTOPUI_SCALING = "1.25";
-    # SSH_ASKPASS = "ksshaskpass";
-
-    PATH = [
-      "$HOME/.npm-global/bin"
-    ];
-
-    # viome
-    GITHUB_VIOME_REPO_USERNAME = config.secrets.github-viome-repo-username;
-    GITHUB_VIOME_REPO_PAT = config.secrets.github-viome-repo-pat;
-  };
-
-  # System packages
-  environment.systemPackages = with pkgs; [
-    # system
-    nixpkgs-fmt
-    usbutils
-    powertop
-    ksshaskpass
-    kdePackages.kconfig
-    kdePackages.partitionmanager
-
-    # Fonts
-    noto-fonts
-    noto-fonts-cjk
-    noto-fonts-emoji
-
-    # utils
-    git
-    btop
-    fastfetch
-    bat
-    starship
-    nvtopPackages.amd
-    appimage-run
-    unrar
-
-    # browsers
-    firefox
-    google-chrome
-
-    # media
-    standardnotes
-    vlc
-    obs-studio
-    shotcut
-    ffmpeg-full
-    guvcview
-    mangohud
-    inkscape
-    gimp
-    prismlauncher
-
-    # comms
-    vesktop
-    slack
-    zoom-us
-
-    # dev
-    vscode
-    distrobox
-    podman-compose
-    jetbrains.idea-community-bin
-    beekeeper-studio
-    lens
-    nodejs_20
-    (sbt-extras.override { jdk = temurin-bin-8; })
-    awscli2
-    maven
-  ];
 
   # Fonts
   fonts = {
@@ -237,24 +141,6 @@
     };
   };
 
-  # Podman
-  virtualisation.containers.enable = true;
-  virtualisation = {
-    podman = {
-      enable = true;
-
-      # Create a `docker` alias for podman, to use it as a drop-in replacement
-      dockerCompat = true;
-
-      # Required for containers under podman-compose to be able to talk to each other.
-      defaultNetwork.settings.dns_enabled = true;
-    };
-  };
-
-
-  # Java
-  programs.java = { enable = true; package = pkgs.temurin-bin-8; };
-
   # Steam
   programs.steam = {
     enable = true;
@@ -263,5 +149,47 @@
     gamescopeSession.enable = true;
   };
 
-}
+  specialisation.viome.configuration = {
+    system.nixos.tags = [ "viome" ];
 
+    boot.kernelPackages = lib.mkForce pkgs.linuxPackages_6_6;
+
+    services.displayManager.autoLogin.user = lib.mkForce "berti-viome";
+
+    environment.sessionVariables = rec {
+      PATH = [
+        "$HOME/.npm-global/bin"
+      ];
+
+      GITHUB_VIOME_REPO_USERNAME = config.secrets.github-viome-repo-username;
+      GITHUB_VIOME_REPO_PAT = config.secrets.github-viome-repo-pat;
+    };
+
+    # Podman
+    virtualisation.containers.enable = true;
+    virtualisation = {
+      podman = {
+        enable = true;
+
+        # Create a `docker` alias for podman, to use it as a drop-in replacement
+        dockerCompat = true;
+
+        # Required for containers under podman-compose to be able to talk to each other.
+        defaultNetwork.settings.dns_enabled = true;
+      };
+    };
+
+    # Java
+    programs.java = { enable = true; package = pkgs.temurin-bin-8; };
+
+    # Disable Steam
+    programs.steam = {
+      enable = lib.mkForce false;
+      remotePlay.openFirewall = lib.mkForce false;
+      dedicatedServer.openFirewall = lib.mkForce false;
+      gamescopeSession.enable = lib.mkForce false;
+    };
+
+  };
+
+}
