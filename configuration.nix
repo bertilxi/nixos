@@ -102,7 +102,13 @@
   nix.settings.auto-optimise-store = true;
 
   # Kernel
-  boot.kernelPackages = pkgs.linuxPackages_xanmod;
+  boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot.kernelParams = [
+    "mem_sleep_default=deep"
+    "pcie_aspm.policy=powersupersave"
+    "amdgpu.sg_display=0"
+    "amdgpu.dcdebugmask=0x10"
+  ];
 
   # Bluetooth
   hardware.bluetooth.enable = true;
@@ -114,6 +120,8 @@
   };
 
   # Asus
+  services.asusd.enable = true;
+  services.asusd.enableUserService = true;
   services.supergfxd.enable = true;
   programs.rog-control-center.enable = true;
 
@@ -151,8 +159,6 @@
 
   specialisation.viome.configuration = {
     system.nixos.tags = [ "viome" ];
-
-    boot.kernelPackages = lib.mkForce pkgs.linuxPackages_6_6;
 
     services.displayManager.autoLogin.user = lib.mkForce "berti-viome";
 

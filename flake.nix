@@ -7,13 +7,9 @@
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
-    auto-cpufreq = {
-      url = "github:AdnanHodzic/auto-cpufreq";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
-  outputs = inputs@{ self, nixpkgs, home-manager, hosts, nixos-hardware, auto-cpufreq, ... }: {
+  outputs = inputs@{ self, nixpkgs, home-manager, hosts, nixos-hardware, ... }: {
     nixosConfigurations.one = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       specialArgs = { inherit inputs; };
@@ -23,11 +19,10 @@
         nixos-hardware.nixosModules.common-cpu-amd-raphael-igpu
         nixos-hardware.nixosModules.common-gpu-amd
         nixos-hardware.nixosModules.common-pc-laptop
+        nixos-hardware.nixosModules.common-pc-laptop-acpi_call
         nixos-hardware.nixosModules.common-pc-laptop-ssd
 
         ./configuration.nix
-
-        auto-cpufreq.nixosModules.default
 
         home-manager.nixosModules.home-manager
         {

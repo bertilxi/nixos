@@ -67,7 +67,6 @@
 
     # browsers
     pkgs.firefox
-    pkgs.google-chrome
 
     # media
     pkgs.standardnotes

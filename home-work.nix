@@ -72,6 +72,7 @@
 
     # browsers
     pkgs.google-chrome
+    pkgs.firefox
 
     # media
     pkgs.vlc
