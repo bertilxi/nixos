@@ -59,11 +59,6 @@
     pkgs.nixpkgs-fmt
     pkgs.ksshaskpass
 
-    # Fonts
-    pkgs.noto-fonts
-    pkgs.noto-fonts-cjk
-    pkgs.noto-fonts-emoji
-
     # utils
     pkgs.git
     pkgs.btop

@@ -108,7 +108,14 @@
     "pcie_aspm.policy=powersupersave"
     "amdgpu.sg_display=0"
     "amdgpu.dcdebugmask=0x10"
+    "ahci.mobile_lpm_policy=3"
   ];
+
+  # Fwupd
+  services.fwupd.enable = true;
+
+  # system76 scheduler
+  services.system76-scheduler.enable = true;
 
   # Bluetooth
   hardware.bluetooth.enable = true;
@@ -125,6 +132,10 @@
   services.supergfxd.enable = true;
   programs.rog-control-center.enable = true;
 
+  # Logitech mouse
+  hardware.logitech.wireless.enable = true;
+  hardware.logitech.wireless.enableGraphical = true;
+
   # Security
   networking.firewall = {
     enable = true;
@@ -135,6 +146,10 @@
     enableDefaultPackages = true;
     packages = with pkgs; [
       (nerdfonts.override { fonts = [ "FiraCode" "JetBrainsMono" ]; })
+      ubuntu_font_family
+      noto-fonts
+      noto-fonts-cjk
+      noto-fonts-emoji
     ];
     fontconfig = {
       antialias = true;
@@ -157,6 +172,10 @@
     gamescopeSession.enable = true;
   };
 
+  # ledger-udev-rules
+  hardware.ledger.enable = true;
+
+  # Work config
   specialisation.viome.configuration = {
     system.nixos.tags = [ "viome" ];
 

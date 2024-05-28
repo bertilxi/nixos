@@ -53,11 +53,6 @@
     pkgs.kdePackages.kconfig
     pkgs.kdePackages.partitionmanager
 
-    # Fonts
-    pkgs.noto-fonts
-    pkgs.noto-fonts-cjk
-    pkgs.noto-fonts-emoji
-
     # utils
     pkgs.git
     pkgs.btop
@@ -67,6 +62,7 @@
 
     # browsers
     pkgs.firefox
+    pkgs.brave
 
     # media
     pkgs.standardnotes
