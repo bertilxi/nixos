@@ -102,7 +102,7 @@
   nix.settings.auto-optimise-store = true;
 
   # Kernel
-  boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot.kernelPackages = pkgs.linuxPackages_xanmod;
   boot.kernelParams = [
     "mem_sleep_default=deep"
     "pcie_aspm.policy=powersupersave"
@@ -110,12 +110,26 @@
     "amdgpu.dcdebugmask=0x10"
     "ahci.mobile_lpm_policy=3"
   ];
+  boot.kernel.sysctl = {
+    "vm.swappiness" = 10;
+    "vm.watermark_boost_factor" = 0;
+    "vm.watermark_scale_factor" = 125;
+    "vm.dirty_bytes" = 268435456;
+    "vm.dirty_background_bytes" = 134217728;
+    "vm.max_map_count" = 2147483642;
+  };
 
   # Fwupd
   services.fwupd.enable = true;
 
+  # Microcode
+  hardware.enableAllFirmware = true;
+
   # system76 scheduler
   services.system76-scheduler.enable = true;
+
+  # zram
+  zramSwap.enable = true;
 
   # Bluetooth
   hardware.bluetooth.enable = true;
@@ -131,10 +145,6 @@
   services.asusd.enableUserService = true;
   services.supergfxd.enable = true;
   programs.rog-control-center.enable = true;
-
-  # Logitech mouse
-  hardware.logitech.wireless.enable = true;
-  hardware.logitech.wireless.enableGraphical = true;
 
   # Security
   networking.firewall = {
@@ -175,6 +185,34 @@
   # ledger-udev-rules
   hardware.ledger.enable = true;
 
+  # System packages
+  environment.systemPackages = with pkgs; [
+    distrobox
+    podman-compose
+    android-tools
+    android-udev-rules
+  ];
+
+  # Podman
+  virtualisation.containers.enable = true;
+  virtualisation = {
+    podman = {
+      enable = true;
+
+      # Create a `docker` alias for podman, to use it as a drop-in replacement
+      dockerCompat = true;
+
+      # Required for containers under podman-compose to be able to talk to each other.
+      defaultNetwork.settings.dns_enabled = true;
+    };
+  };
+
+  environment.sessionVariables = rec {
+    PATH = [
+      "$HOME/.npm-global/bin"
+    ];
+  };
+
   # Work config
   specialisation.viome.configuration = {
     system.nixos.tags = [ "viome" ];
@@ -188,20 +226,6 @@
 
       GITHUB_VIOME_REPO_USERNAME = config.secrets.github-viome-repo-username;
       GITHUB_VIOME_REPO_PAT = config.secrets.github-viome-repo-pat;
-    };
-
-    # Podman
-    virtualisation.containers.enable = true;
-    virtualisation = {
-      podman = {
-        enable = true;
-
-        # Create a `docker` alias for podman, to use it as a drop-in replacement
-        dockerCompat = true;
-
-        # Required for containers under podman-compose to be able to talk to each other.
-        defaultNetwork.settings.dns_enabled = true;
-      };
     };
 
     # Java

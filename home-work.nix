@@ -56,7 +56,6 @@
   # Packages
   home.packages = [
     # system
-    pkgs.nixpkgs-fmt
     pkgs.ksshaskpass
 
     # utils
@@ -82,8 +81,6 @@
 
     # dev
     pkgs.vscode
-    pkgs.distrobox
-    pkgs.podman-compose
     pkgs.jetbrains.idea-community-bin
     pkgs.beekeeper-studio
     pkgs.lens

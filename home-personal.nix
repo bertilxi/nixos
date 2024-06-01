@@ -82,6 +82,8 @@
     # dev
     pkgs.vscode
     pkgs.beekeeper-studio
+    pkgs.nodejs_20
+    pkgs.doppler
   ];
 
 }
