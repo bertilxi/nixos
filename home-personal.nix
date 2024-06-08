@@ -75,6 +75,7 @@
     pkgs.inkscape
     pkgs.gimp
     pkgs.prismlauncher
+    pkgs.mpv
 
     # comms
     pkgs.vesktop

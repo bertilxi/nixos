@@ -93,7 +93,7 @@
   # Nix config
   nix.optimise.automatic = true;
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
-  boot.loader.systemd-boot.configurationLimit = 10;
+  boot.loader.systemd-boot.configurationLimit = 8;
   nix.gc = {
     automatic = true;
     dates = "weekly";
@@ -102,7 +102,9 @@
   nix.settings.auto-optimise-store = true;
 
   # Kernel
-  boot.kernelPackages = pkgs.linuxPackages_xanmod;
+  # boot.kernelPackages = pkgs.linuxPackages_xanmod;
+  boot.kernelPackages = pkgs.linuxPackages_latest;
+
   boot.kernelParams = [
     "mem_sleep_default=deep"
     "pcie_aspm.policy=powersupersave"
@@ -120,13 +122,14 @@
   };
 
   # Fwupd
-  services.fwupd.enable = true;
+  services.fwupd.enable = false;
 
   # Microcode
-  hardware.enableAllFirmware = true;
+  hardware.cpu.amd.updateMicrocode = true;
 
-  # system76 scheduler
-  services.system76-scheduler.enable = true;
+  # laptop
+  powerManagement.enable = true;
+  services.auto-cpufreq.enable = true;
 
   # zram
   zramSwap.enable = true;
@@ -187,26 +190,11 @@
 
   # System packages
   environment.systemPackages = with pkgs; [
-    distrobox
-    podman-compose
     android-tools
     android-udev-rules
   ];
 
-  # Podman
-  virtualisation.containers.enable = true;
-  virtualisation = {
-    podman = {
-      enable = true;
-
-      # Create a `docker` alias for podman, to use it as a drop-in replacement
-      dockerCompat = true;
-
-      # Required for containers under podman-compose to be able to talk to each other.
-      defaultNetwork.settings.dns_enabled = true;
-    };
-  };
-
+  # Session vars
   environment.sessionVariables = rec {
     PATH = [
       "$HOME/.npm-global/bin"
@@ -231,6 +219,21 @@
     # Java
     programs.java = { enable = true; package = pkgs.temurin-bin-8; };
 
+    # Podman
+    virtualisation.containers.enable = true;
+    virtualisation = {
+      podman = {
+        enable = true;
+
+        # Create a `docker` alias for podman, to use it as a drop-in replacement
+        dockerCompat = true;
+
+        # Required for containers under podman-compose to be able to talk to each other.
+        defaultNetwork.settings.dns_enabled = true;
+      };
+    };
+
+    # Disables
     # Disable Steam
     programs.steam = {
       enable = lib.mkForce false;
@@ -238,6 +241,9 @@
       dedicatedServer.openFirewall = lib.mkForce false;
       gamescopeSession.enable = lib.mkForce false;
     };
+
+    # disable ledger-udev-rules
+    hardware.ledger.enable = lib.mkForce false;
 
   };
 

@@ -3,5 +3,7 @@
 ## How to update?
 
 ```sh
-sudo nixos-rebuild switch --flake path:.
+cd ~/nixos
+sudo nix flake update
+sudo nixos-rebuild boot --flake path:.
 ```

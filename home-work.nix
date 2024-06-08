@@ -88,6 +88,8 @@
     (pkgs.sbt-extras.override { jdk = pkgs.temurin-bin-8; })
     pkgs.awscli2
     pkgs.maven
+    pkgs.distrobox
+    pkgs.podman-compose
   ];
 
 }
