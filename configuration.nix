@@ -4,6 +4,8 @@
     [
       ./hardware-configuration.nix
 
+      <nixpkgs/nixos/modules/profiles/hardened.nix>
+
       ./secrets.nix
     ];
 
@@ -101,39 +103,6 @@
   };
   nix.settings.auto-optimise-store = true;
 
-  # Kernel
-  # boot.kernelPackages = pkgs.linuxPackages_xanmod;
-  boot.kernelPackages = pkgs.linuxPackages_latest;
-
-  boot.kernelParams = [
-    "mem_sleep_default=deep"
-    "pcie_aspm.policy=powersupersave"
-    "amdgpu.sg_display=0"
-    "amdgpu.dcdebugmask=0x10"
-    "ahci.mobile_lpm_policy=3"
-  ];
-  boot.kernel.sysctl = {
-    "vm.swappiness" = 10;
-    "vm.watermark_boost_factor" = 0;
-    "vm.watermark_scale_factor" = 125;
-    "vm.dirty_bytes" = 268435456;
-    "vm.dirty_background_bytes" = 134217728;
-    "vm.max_map_count" = 2147483642;
-  };
-
-  # Fwupd
-  services.fwupd.enable = false;
-
-  # Microcode
-  hardware.cpu.amd.updateMicrocode = true;
-
-  # laptop
-  powerManagement.enable = true;
-  services.auto-cpufreq.enable = true;
-
-  # zram
-  zramSwap.enable = true;
-
   # Bluetooth
   hardware.bluetooth.enable = true;
   hardware.bluetooth.powerOnBoot = true;
@@ -150,8 +119,30 @@
   programs.rog-control-center.enable = true;
 
   # Security
-  networking.firewall = {
-    enable = true;
+  networking.firewall.enable = true;
+  networking.firewall.allowedTCPPorts = [ ];
+  networking.firewall.allowedUDPPorts = [ ];
+
+  systemd.coredump.enable = false;
+  services.opensnitch.enable = true;
+  services.clamav.daemon.enable = true;
+  services.clamav.updater.enable = true;
+  security.chromiumSuidSandbox.enable = true;
+
+  programs.firejail.enable = true;
+  programs.firejail.wrappedBinaries = {
+    firefox = {
+      executable = "${pkgs.lib.getBin pkgs.firefox}/bin/firefox";
+      profile = "${pkgs.firejail}/etc/firejail/firefox.profile";
+    };
+    brave = {
+      executable = "${pkgs.lib.getBin pkgs.brave}/bin/brave";
+      profile = "${pkgs.firejail}/etc/firejail/brave.profile";
+    };
+    google-chrome = {
+      executable = "${pkgs.lib.getBin pkgs.google-chrome}/bin/google-chrome";
+      profile = "${pkgs.firejail}/etc/firejail/google-chrome.profile";
+    };
   };
 
   # Fonts
@@ -190,6 +181,14 @@
 
   # System packages
   environment.systemPackages = with pkgs; [
+    kdePackages.merkuro
+    brave
+    firefox
+    google-chrome
+    jellyfin
+    jellyfin-web
+    jellyfin-ffmpeg
+
     android-tools
     android-udev-rules
   ];
@@ -199,6 +198,13 @@
     PATH = [
       "$HOME/.npm-global/bin"
     ];
+  };
+
+  # jellyfin
+  services.jellyfin = {
+    enable = true;
+    openFirewall = true;
+    user = "berti";
   };
 
   # Work config
@@ -234,7 +240,7 @@
     };
 
     # Disables
-    # Disable Steam
+    # Steam
     programs.steam = {
       enable = lib.mkForce false;
       remotePlay.openFirewall = lib.mkForce false;
@@ -242,8 +248,14 @@
       gamescopeSession.enable = lib.mkForce false;
     };
 
-    # disable ledger-udev-rules
+    # ledger-udev-rules
     hardware.ledger.enable = lib.mkForce false;
+
+    # jellyfin
+    services.jellyfin = {
+      enable = lib.mkForce false;
+      openFirewall = lib.mkForce false;
+    };
 
   };
 

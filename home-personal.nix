@@ -51,7 +51,7 @@
     pkgs.powertop
     pkgs.ksshaskpass
     pkgs.kdePackages.kconfig
-    pkgs.kdePackages.partitionmanager
+    pkgs.gparted
 
     # utils
     pkgs.git
@@ -61,8 +61,7 @@
     pkgs.unrar
 
     # browsers
-    pkgs.firefox
-    pkgs.brave
+    pkgs.framesh
 
     # media
     pkgs.standardnotes
@@ -76,6 +75,7 @@
     pkgs.gimp
     pkgs.prismlauncher
     pkgs.mpv
+    pkgs.qbittorrent
 
     # comms
     pkgs.vesktop

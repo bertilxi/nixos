@@ -64,10 +64,6 @@
     pkgs.fastfetch
     pkgs.bat
 
-    # browsers
-    pkgs.google-chrome
-    pkgs.firefox
-
     # media
     pkgs.vlc
     pkgs.obs-studio
