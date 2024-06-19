@@ -49,6 +49,7 @@
     # system
     pkgs.nixpkgs-fmt
     pkgs.powertop
+    pkgs.powerstat
     pkgs.ksshaskpass
     pkgs.kdePackages.kconfig
     pkgs.gparted

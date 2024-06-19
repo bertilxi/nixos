@@ -1,10 +1,8 @@
-{ config, pkgs, lib, ... }:
+{ config, pkgs, lib, modulesPath, ... }:
 {
   imports =
     [
       ./hardware-configuration.nix
-
-      <nixpkgs/nixos/modules/profiles/hardened.nix>
 
       ./secrets.nix
     ];
@@ -75,7 +73,7 @@
   users.users.berti-viome = {
     isNormalUser = true;
     description = "Work";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "docker" ];
   };
 
   # Enable automatic login for the user.
@@ -103,6 +101,9 @@
   };
   nix.settings.auto-optimise-store = true;
 
+  boot.kernelPackages = pkgs.linuxPackages_xanmod;
+  powerManagement.enable = true;
+
   # Bluetooth
   hardware.bluetooth.enable = true;
   hardware.bluetooth.powerOnBoot = true;
@@ -120,30 +121,6 @@
 
   # Security
   networking.firewall.enable = true;
-  networking.firewall.allowedTCPPorts = [ ];
-  networking.firewall.allowedUDPPorts = [ ];
-
-  systemd.coredump.enable = false;
-  services.opensnitch.enable = true;
-  services.clamav.daemon.enable = true;
-  services.clamav.updater.enable = true;
-  security.chromiumSuidSandbox.enable = true;
-
-  programs.firejail.enable = true;
-  programs.firejail.wrappedBinaries = {
-    firefox = {
-      executable = "${pkgs.lib.getBin pkgs.firefox}/bin/firefox";
-      profile = "${pkgs.firejail}/etc/firejail/firefox.profile";
-    };
-    brave = {
-      executable = "${pkgs.lib.getBin pkgs.brave}/bin/brave";
-      profile = "${pkgs.firejail}/etc/firejail/brave.profile";
-    };
-    google-chrome = {
-      executable = "${pkgs.lib.getBin pkgs.google-chrome}/bin/google-chrome";
-      profile = "${pkgs.firejail}/etc/firejail/google-chrome.profile";
-    };
-  };
 
   # Fonts
   fonts = {
@@ -181,13 +158,9 @@
 
   # System packages
   environment.systemPackages = with pkgs; [
-    kdePackages.merkuro
     brave
     firefox
     google-chrome
-    jellyfin
-    jellyfin-web
-    jellyfin-ffmpeg
 
     android-tools
     android-udev-rules
@@ -198,13 +171,8 @@
     PATH = [
       "$HOME/.npm-global/bin"
     ];
-  };
-
-  # jellyfin
-  services.jellyfin = {
-    enable = true;
-    openFirewall = true;
-    user = "berti";
+    STEAM_FORCE_DESKTOPUI_SCALING = "1.5";
+    NIXOS_OZONE_WL = "1";
   };
 
   # Work config
@@ -226,6 +194,7 @@
     programs.java = { enable = true; package = pkgs.temurin-bin-8; };
 
     # Podman
+    virtualisation.docker.enable = false;
     virtualisation.containers.enable = true;
     virtualisation = {
       podman = {
@@ -250,12 +219,6 @@
 
     # ledger-udev-rules
     hardware.ledger.enable = lib.mkForce false;
-
-    # jellyfin
-    services.jellyfin = {
-      enable = lib.mkForce false;
-      openFirewall = lib.mkForce false;
-    };
 
   };
 
